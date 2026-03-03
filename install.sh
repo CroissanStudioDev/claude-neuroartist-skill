@@ -44,6 +44,9 @@ detect_cursor() {
 detect_windsurf() {
   [ -d "$HOME/.windsurf" ] || [ -d "$HOME/Library/Application Support/Windsurf" ] || [ -d "$HOME/.config/Windsurf" ]
 }
+detect_opencode() {
+  command -v opencode &> /dev/null || [ -d "$HOME/.opencode" ] || [ -d "$HOME/.config/opencode" ]
+}
 
 # Install for specific agent
 install_claude() {
@@ -67,6 +70,11 @@ install_windsurf() {
   install_or_update "$HOME/.windsurf/skills/neuroartist" "~/.windsurf/skills/neuroartist"
 }
 
+install_opencode() {
+  echo -e "${GREEN}→${NC} OpenCode"
+  install_or_update "$HOME/.opencode/skills/neuroartist" "~/.opencode/skills/neuroartist"
+}
+
 show_help() {
   echo "🎨 neuroartist plugin installer"
   echo ""
@@ -74,6 +82,7 @@ show_help() {
   echo ""
   echo "Agents:"
   echo "  claude     Claude Code (~/.claude/plugins)"
+  echo "  opencode   OpenCode (~/.opencode/skills)"
   echo "  openclaw   OpenClaw (~/.openclaw/skills)"
   echo "  cursor     Cursor (~/.cursor/skills)"
   echo "  windsurf   Windsurf (~/.windsurf/skills)"
@@ -95,7 +104,7 @@ AGENTS=()
 for arg in "$@"; do
   case "$arg" in
     -h|--help) show_help ;;
-    claude|openclaw|cursor|windsurf|all) AGENTS+=("$arg") ;;
+    claude|opencode|openclaw|cursor|windsurf|all) AGENTS+=("$arg") ;;
     *) echo "Unknown agent: $arg. Use -h for help."; exit 1 ;;
   esac
 done
@@ -110,6 +119,10 @@ if [ ${#AGENTS[@]} -eq 0 ] || [[ " ${AGENTS[*]} " =~ " all " ]]; then
   # Auto-detect mode
   if detect_claude; then
     install_claude
+    installed=$((installed + 1))
+  fi
+  if detect_opencode; then
+    install_opencode
     installed=$((installed + 1))
   fi
   if detect_openclaw; then
@@ -134,6 +147,14 @@ else
           installed=$((installed + 1))
         else
           echo -e "${YELLOW}⚠${NC} Claude Code not found (claude CLI not in PATH)"
+        fi
+        ;;
+      opencode)
+        if detect_opencode; then
+          install_opencode
+          installed=$((installed + 1))
+        else
+          echo -e "${YELLOW}⚠${NC} OpenCode not found (opencode CLI not in PATH)"
         fi
         ;;
       openclaw)
@@ -169,7 +190,7 @@ echo ""
 if [ $installed -eq 0 ]; then
   echo -e "${YELLOW}No agents installed.${NC}"
   echo ""
-  echo "Supported agents: claude, openclaw, cursor, windsurf"
+  echo "Supported agents: claude, opencode, openclaw, cursor, windsurf"
   echo "Use -h for help."
   exit 1
 fi

@@ -1,205 +1,74 @@
-# Kling 2.5/3.0 Video Prompting Guide
+# Kling Video Prompting
 
-Best practices for Kuaishou's Kling video models.
+## Models
 
-## Model Overview
+| Model | Duration | Features |
+|-------|----------|----------|
+| Kling 2.5 Turbo | 5s | Start/End frame, fast |
+| Kling 3.0 | 15s | 4K/60fps, multi-shot, dialogue |
 
-| Model | Duration | Resolution | Features |
-|-------|----------|------------|----------|
-| Kling 2.5 Turbo | 5s | 1080p | Start/End Frame, fast |
-| Kling 3.0 | 15s | 4K/60fps | Multi-shot, dialogue, audio |
-
-## Core Principle
-
-**Think like a director, not a photographer.**
-
-Video prompts need motion, not just description. Describe how the shot moves.
-
-## 6 Prompt Elements
-
-1. **Camera** - shot type and movement (FIRST!)
-2. **Subject** - who/what and their action
-3. **Environment** - where the scene takes place
-4. **Lighting** - light source and mood
-5. **Texture** - physical details for realism
-6. **Emotion** - mood of the moment
-
-## Prompt Formula
+## Formula
 
 ```
-[Camera movement] + [Subject action] + [Environment] + [Lighting] + [Mood]
+[Camera movement] + [Subject action] + [Environment] + [Lighting]
 ```
 
-## Examples: Good vs Bad
+**Think like director, not photographer.** Describe motion, not static scene.
 
-### Basic Scene
-```
-Bad: "person walking on street"
-
-Good: "Tracking shot following a man in a long coat walking down a
-rain-slicked Tokyo alley at night, neon signs reflecting in puddles,
-camera slowly pulls back to reveal the towering buildings"
-```
-
-### Animal
-```
-Bad: "cat on couch"
-
-Good: "Close-up of a tabby cat slowly opening its eyes, stretching on
-a sunlit velvet couch, dust particles floating in golden afternoon light,
-camera gently drifts closer, settles on the cat's face"
-```
-
-### Product
-```
-Bad: "watch spinning"
-
-Good: "Slow dolly around a luxury watch on black velvet, dramatic side
-lighting catching the metal surfaces, watch face reflecting studio lights,
-camera completes 180-degree arc, cinematic commercial style"
-```
-
-## Camera Types (Use Exact Terms)
+## Camera Terms
 
 | Term | Description |
 |------|-------------|
-| `tracking shot` | Camera follows the subject |
-| `dolly in/out` | Camera moves toward/away |
-| `crane shot` | Camera rises up |
-| `POV shot` | First-person perspective |
-| `handheld` | Shaky, documentary feel |
-| `static shot` | Camera doesn't move |
+| `tracking shot` | Follows subject |
+| `dolly in/out` | Moves toward/away |
+| `crane shot` | Rises up |
+| `POV shot` | First-person |
+| `static shot` | No movement |
 | `slow push in` | Gradual approach |
-| `pan left/right` | Camera rotates horizontally |
-| `tilt up/down` | Camera rotates vertically |
-| `orbit/arc` | Camera circles subject |
+| `orbit/arc` | Circles subject |
 
-## Kling 3.0: Multi-Shot Sequences
+## Examples
 
-Kling 3.0 supports up to 6 shots in one generation. Label each shot:
+**Bad:** `person walking on street`
+**Good:** `Tracking shot following man in coat down rain-slicked Tokyo alley at night, neon reflecting in puddles, camera pulls back to reveal buildings`
 
+**Bad:** `cat on couch`
+**Good:** `Close-up of tabby cat opening eyes, stretching on sunlit velvet couch, dust in golden light, camera drifts closer to face`
+
+## Multi-Shot (Kling 3.0)
+
+Up to 6 shots in one generation:
 ```
-Shot 1: Wide establishing shot of a misty mountain lake at dawn
-Shot 2: Medium shot of a lone figure standing at the water's edge
-Shot 3: Close-up of their hands releasing a paper boat
-Shot 4: Tracking shot following the boat as it drifts away
-Shot 5: Wide shot pulling back, figure now small against vast landscape
-```
-
-### Multi-Shot API
-```json
-{
-  "m": "fal-ai/kling-video/v3/text-to-video",
-  "i": {
-    "prompt": "Shot 1: Wide shot of coffee shop interior. Shot 2: Close-up of espresso being poured. Shot 3: Medium shot of barista smiling. Shot 4: Close-up of latte art being created.",
-    "duration": 10
-  }
-}
+Shot 1: Wide establishing shot of mountain lake at dawn
+Shot 2: Medium shot of figure at water's edge
+Shot 3: Close-up of hands releasing paper boat
+Shot 4: Tracking shot following boat drifting
 ```
 
-## Kling 3.0: Dialogue
-
-Native audio with voice attribution:
+## Dialogue (Kling 3.0)
 
 ```
-"Two friends at a coffee shop. Shot 1: Medium two-shot, they laugh together.
-Woman says 'Remember that trip to Paris?' Shot 2: Close-up of man smiling,
-he replies 'How could I forget?' Natural warm lighting, shallow depth of field."
+"Coffee shop. Shot 1: Two-shot, they laugh. Woman says 'Remember Paris?' Shot 2: Close-up man replies 'How could I forget?'"
 ```
-
-### Dialogue API
-```json
-{
-  "m": "fal-ai/kling-video/v3/text-to-video",
-  "i": {
-    "prompt": "Business meeting. Shot 1: Wide shot of conference room. Man in suit says 'Let's discuss the quarterly results.' Shot 2: Close-up of woman nodding, she responds 'The numbers look promising.'",
-    "enable_audio": true
-  }
-}
-```
+Use `"enable_audio": true`
 
 ## Image-to-Video
 
-**CRITICAL: Only describe motion, not what's in the image!**
+**Only describe motion, not what's in image!**
 
-```
-Bad: "A woman in red dress standing in a garden, flowers around her"
-
-Good: "She slowly turns her head to the left, a gentle breeze moves
-her hair, petals drift past in the wind"
-```
-
-### I2V API
-```json
-{
-  "m": "fal-ai/kling-video/v2.5/turbo/image-to-video",
-  "i": {
-    "image_url": "https://cdn.example.com/portrait.jpg",
-    "prompt": "She blinks slowly, a subtle smile forms on her lips,
-    slight head tilt to the right"
-  }
-}
-```
+**Bad:** `Woman in red dress in garden`
+**Good:** `She turns head left, breeze moves hair, petals drift past`
 
 ## Start/End Frame (Kling 2.5)
 
-Control exact beginning and ending:
-
 ```json
-{
-  "m": "fal-ai/kling-video/v2.5/turbo/text-to-video",
-  "i": {
-    "prompt": "Woman walking through garden",
-    "start_frame_url": "https://cdn.example.com/start.jpg",
-    "end_frame_url": "https://cdn.example.com/end.jpg"
-  }
-}
+{"m":"fal-ai/kling-video/v2.5/turbo/text-to-video","i":{"prompt":"...","start_frame_url":"url","end_frame_url":"url"}}
 ```
 
-## Motion Endpoints
+## Templates
 
-Always specify where motion ends to prevent glitches:
+**Product:** `Slow 360-degree orbit around [product] on white, soft lighting, completes arc, settles on front view`
 
-```
-Bad: "Camera zooms in on face"
+**Lifestyle:** `Tracking shot following [person] through [location], natural light, they [action], camera pulls back`
 
-Good: "Camera slowly pushes in on face, then settles into a close-up"
-```
-
-## Common Mistakes
-
-1. **No camera movement** - creates static, boring video
-2. **Too many elements** - Kling 2.5 handles 3-4 elements max
-3. **Redescribing image** - for I2V, only describe motion
-4. **Open-ended motion** - always specify motion endpoints
-5. **Vague spatial language** - use specific directions (left, right, up)
-
-## Model Selection
-
-| Task | Model | Notes |
-|------|-------|-------|
-| Fast preview | Kling 2.5 Turbo | 45s generation |
-| Quality video | Kling 3.0 | 4K/60fps, longer |
-| Product animation | Kling 2.5 I2V | From product photo |
-| Storytelling | Kling 3.0 Multi-shot | Up to 6 shots |
-| With dialogue | Kling 3.0 | Native audio |
-
-## Quick Templates
-
-### Product Showcase
-```
-"Slow 360-degree orbit around [product] on white cyclorama, soft studio
-lighting, product slowly rotates on turntable, camera settles on front view"
-```
-
-### Lifestyle Scene
-```
-"Tracking shot following [person] through [location], natural lighting,
-they [action], camera pulls back to establish environment"
-```
-
-### Cinematic Opener
-```
-"Crane shot rising from ground level, revealing [landscape] at golden hour,
-dramatic clouds moving slowly, camera settles on wide establishing shot"
-```
+**Cinematic:** `Crane shot rising from ground, revealing [landscape] at golden hour, settles on wide shot`

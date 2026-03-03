@@ -8,7 +8,16 @@ AI image/video/audio generation plugin for coding assistants. 1195+ models, toke
 |----------|--------|----------------|
 | Claude Code | ✅ Plugin | `/plugin marketplace add` |
 | Cursor | ✅ Compatible | git clone |
+| Windsurf | ✅ Compatible | git clone |
 | OpenClaw | ✅ CLI | `openclaw skills install` |
+
+## Quick Install
+
+```bash
+curl -sSL https://raw.githubusercontent.com/CroissanStudioDev/neuroartist-skill-agents/main/install.sh | bash
+```
+
+The script auto-detects installed AI agents and installs for each.
 
 ## Installation
 
@@ -75,6 +84,7 @@ curl -X POST https://neuroartist.ru/api/v1/generate \
 ## Files
 
 ```
+├── install.sh                  # Universal installer
 ├── .claude-plugin/
 │   └── plugin.json             # Plugin manifest
 └── skills/

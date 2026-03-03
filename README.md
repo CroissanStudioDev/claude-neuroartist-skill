@@ -26,6 +26,14 @@ git clone https://github.com/CroissanStudioDev/neuroartist-skill-agents.git ~/.c
 
 ### OpenClaw
 
+**CLI (recommended):**
+```bash
+openclaw skills install github:CroissanStudioDev/neuroartist-skill-agents
+# or shorter
+claw install github:CroissanStudioDev/neuroartist-skill-agents
+```
+
+**Manual:**
 ```bash
 git clone https://github.com/CroissanStudioDev/neuroartist-skill-agents.git ~/.openclaw/skills/neuroartist
 ```

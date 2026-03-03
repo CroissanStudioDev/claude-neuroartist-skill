@@ -4,40 +4,57 @@ set -e
 REPO="https://github.com/CroissanStudioDev/neuroartist-skill-agents"
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo "🎨 Installing neuroartist plugin..."
+# Install or update plugin to a directory
+# Usage: install_or_update <target_dir> <display_path> [extra_message]
+install_or_update() {
+  local target_dir="$1"
+  local display_path="$2"
+  local extra_msg="$3"
+
+  mkdir -p "$(dirname "$target_dir")"
+
+  if [ ! -d "$target_dir" ]; then
+    git clone --depth 1 "$REPO.git" "$target_dir" 2>/dev/null
+    echo -e "  ${GREEN}Installed${NC} to $display_path"
+    [ -n "$extra_msg" ] && echo -e "  ${YELLOW}$extra_msg${NC}"
+  else
+    # Update existing installation
+    cd "$target_dir"
+    git fetch origin main --depth 1 2>/dev/null
+    LOCAL=$(git rev-parse HEAD 2>/dev/null)
+    REMOTE=$(git rev-parse origin/main 2>/dev/null)
+
+    if [ "$LOCAL" != "$REMOTE" ]; then
+      git reset --hard origin/main 2>/dev/null
+      echo -e "  ${BLUE}Updated${NC} at $display_path"
+    else
+      echo -e "  Already up to date at $display_path"
+    fi
+    cd - > /dev/null
+  fi
+}
+
+echo "🎨 neuroartist plugin installer"
 echo ""
 
 installed=0
+updated=0
 
 # Claude Code (plugin system)
 if command -v claude &> /dev/null; then
   echo -e "${GREEN}✓${NC} Claude Code detected"
-  CLAUDE_PLUGINS="$HOME/.claude/plugins"
-  mkdir -p "$CLAUDE_PLUGINS"
-  if [ ! -d "$CLAUDE_PLUGINS/neuroartist" ]; then
-    git clone --depth 1 "$REPO.git" "$CLAUDE_PLUGINS/neuroartist" 2>/dev/null
-    echo "  Installed to ~/.claude/plugins/neuroartist"
-    echo -e "  ${YELLOW}Run: /plugin marketplace add CroissanStudioDev/neuroartist-skill-agents${NC}"
-  else
-    echo "  Already installed at ~/.claude/plugins/neuroartist"
-  fi
+  install_or_update "$HOME/.claude/plugins/neuroartist" "~/.claude/plugins/neuroartist" \
+    "Run: /plugin marketplace add CroissanStudioDev/neuroartist-skill-agents"
   installed=$((installed + 1))
 fi
 
 # OpenClaw
 if command -v openclaw &> /dev/null || command -v claw &> /dev/null; then
   echo -e "${GREEN}✓${NC} OpenClaw detected"
-  OPENCLAW_SKILLS="$HOME/.openclaw/skills"
-  mkdir -p "$OPENCLAW_SKILLS"
-  if [ ! -d "$OPENCLAW_SKILLS/neuroartist" ]; then
-    git clone --depth 1 "$REPO.git" "$OPENCLAW_SKILLS/neuroartist" 2>/dev/null
-    echo "  Installed to ~/.openclaw/skills/neuroartist"
-  else
-    echo "  Already installed at ~/.openclaw/skills/neuroartist"
-  fi
+  install_or_update "$HOME/.openclaw/skills/neuroartist" "~/.openclaw/skills/neuroartist"
   installed=$((installed + 1))
 fi
 
@@ -53,14 +70,7 @@ fi
 
 if [ -n "$CURSOR_DIR" ]; then
   echo -e "${GREEN}✓${NC} Cursor detected"
-  CURSOR_SKILLS="$HOME/.cursor/skills"
-  mkdir -p "$CURSOR_SKILLS"
-  if [ ! -d "$CURSOR_SKILLS/neuroartist" ]; then
-    git clone --depth 1 "$REPO.git" "$CURSOR_SKILLS/neuroartist" 2>/dev/null
-    echo "  Installed to ~/.cursor/skills/neuroartist"
-  else
-    echo "  Already installed at ~/.cursor/skills/neuroartist"
-  fi
+  install_or_update "$HOME/.cursor/skills/neuroartist" "~/.cursor/skills/neuroartist"
   installed=$((installed + 1))
 fi
 
@@ -76,14 +86,7 @@ fi
 
 if [ -n "$WINDSURF_DIR" ]; then
   echo -e "${GREEN}✓${NC} Windsurf detected"
-  WINDSURF_SKILLS="$HOME/.windsurf/skills"
-  mkdir -p "$WINDSURF_SKILLS"
-  if [ ! -d "$WINDSURF_SKILLS/neuroartist" ]; then
-    git clone --depth 1 "$REPO.git" "$WINDSURF_SKILLS/neuroartist" 2>/dev/null
-    echo "  Installed to ~/.windsurf/skills/neuroartist"
-  else
-    echo "  Already installed at ~/.windsurf/skills/neuroartist"
-  fi
+  install_or_update "$HOME/.windsurf/skills/neuroartist" "~/.windsurf/skills/neuroartist"
   installed=$((installed + 1))
 fi
 
@@ -103,7 +106,7 @@ if [ $installed -eq 0 ]; then
   exit 1
 fi
 
-echo -e "${GREEN}✓ Done!${NC} Installed for $installed agent(s)"
+echo -e "${GREEN}✓ Done!${NC} Processed $installed agent(s)"
 echo ""
-echo "Restart your agent to load the plugin."
+echo "Restart your agent to load changes."
 echo "Docs: https://neuroartist.ru/docs"

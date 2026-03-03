@@ -1,15 +1,23 @@
 {
-  "name": "neuroartist-marketplace",
-  "description": "AI generation plugins for coding assistants",
+  "name": "neuroartist-plugins",
+  "owner": {
+    "name": "CroissanStudio"
+  },
+  "metadata": {
+    "description": "AI generation plugins for coding assistants"
+  },
   "plugins": [
     {
       "name": "neuroartist",
+      "source": "./",
       "description": "AI image/video/audio generation via neuroartist API. 1195+ models, token-optimized, RU-friendly.",
       "version": "1.0.0",
-      "source": {
-        "type": "local",
-        "path": "."
-      }
+      "author": {
+        "name": "CroissanStudio"
+      },
+      "homepage": "https://neuroartist.ru",
+      "repository": "https://github.com/CroissanStudioDev/neuroartist-skill-agents",
+      "license": "GPL-3.0"
     }
   ]
 }

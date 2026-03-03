@@ -1,0 +1,15 @@
+{
+  "name": "neuroartist-marketplace",
+  "description": "AI generation plugins for coding assistants",
+  "plugins": [
+    {
+      "name": "neuroartist",
+      "description": "AI image/video/audio generation via neuroartist API. 1195+ models, token-optimized, RU-friendly.",
+      "version": "1.0.0",
+      "source": {
+        "type": "local",
+        "path": "."
+      }
+    }
+  ]
+}

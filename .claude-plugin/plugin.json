@@ -1,0 +1,11 @@
+{
+  "name": "neuroartist",
+  "description": "AI image/video/audio generation via neuroartist API. 1195+ models, token-optimized, RU-friendly.",
+  "version": "1.0.0",
+  "author": {
+    "name": "CroissanStudio"
+  },
+  "homepage": "https://neuroartist.ru",
+  "repository": "https://github.com/CroissanStudioDev/neuroartist-skill-agents",
+  "license": "GPL-3.0"
+}

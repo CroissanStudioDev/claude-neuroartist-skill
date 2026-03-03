@@ -1,27 +1,31 @@
-# neuroartist Skill
+# neuroartist Plugin
 
-AI image/video/audio generation skill for coding assistants. 1195+ models, token-optimized, RU-friendly.
+AI image/video/audio generation plugin for coding assistants. 1195+ models, token-optimized, RU-friendly.
 
 ## Supported Platforms
 
-| Platform | Status | Installation |
-|----------|--------|--------------|
-| Claude Code | ✅ Native | `~/.claude/skills/neuroartist` |
-| Cursor | ✅ Compatible | `~/.cursor/skills/neuroartist` |
-| OpenClaw | ✅ Compatible | `~/.openclaw/skills/neuroartist` |
+| Platform | Status | Native Install |
+|----------|--------|----------------|
+| Claude Code | ✅ Plugin | `/plugin marketplace add` |
+| Cursor | ✅ Compatible | git clone |
+| OpenClaw | ✅ CLI | `openclaw skills install` |
 
 ## Installation
 
-### Claude Code
+### Claude Code (recommended)
 
+**Via plugin system:**
 ```bash
-git clone https://github.com/CroissanStudioDev/neuroartist-skill-agents.git ~/.claude/skills/neuroartist
+# 1. Add marketplace (one time)
+/plugin marketplace add CroissanStudioDev/neuroartist-skill-agents
+
+# 2. Install plugin
+/plugin install neuroartist@CroissanStudioDev-neuroartist-skill-agents
 ```
 
-### Cursor
-
+**Manual:**
 ```bash
-git clone https://github.com/CroissanStudioDev/neuroartist-skill-agents.git ~/.cursor/skills/neuroartist
+git clone https://github.com/CroissanStudioDev/neuroartist-skill-agents.git ~/.claude/plugins/neuroartist
 ```
 
 ### OpenClaw
@@ -36,6 +40,12 @@ claw install github:CroissanStudioDev/neuroartist-skill-agents
 **Manual:**
 ```bash
 git clone https://github.com/CroissanStudioDev/neuroartist-skill-agents.git ~/.openclaw/skills/neuroartist
+```
+
+### Cursor
+
+```bash
+git clone https://github.com/CroissanStudioDev/neuroartist-skill-agents.git ~/.cursor/skills/neuroartist
 ```
 
 ## Features
@@ -65,14 +75,18 @@ curl -X POST https://neuroartist.ru/api/v1/generate \
 ## Files
 
 ```
-├── SKILL.md                    # Main skill (always loaded)
-├── references/
-│   ├── models.md               # Model audit
-│   ├── platforms.md            # RU platform sizes
-│   ├── prompting-images.md     # Nano Banana guide
-│   └── prompting-video.md      # Kling guide
-└── examples/
-    └── workflows.md            # Workflow examples
+├── .claude-plugin/
+│   └── plugin.json             # Plugin manifest
+└── skills/
+    └── neuroartist/
+        ├── SKILL.md            # Main skill
+        ├── references/
+        │   ├── models.md       # Model audit
+        │   ├── platforms.md    # RU platform sizes
+        │   ├── prompting-images.md
+        │   └── prompting-video.md
+        └── examples/
+            └── workflows.md
 ```
 
 ## Triggers

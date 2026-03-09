@@ -72,10 +72,117 @@ while status != "completed"; do
 done
 ```
 
+## Audio Pipelines
+
+### Text-to-Speech
+```json
+{"m":"fal-ai/f5-tts","i":{"gen_text":"Привет! Это тестовое сообщение."},"s":true}
+```
+
+### Voice Cloning
+```bash
+# 1. Upload reference audio (10-30s sample)
+curl -X POST https://skill.neuroartist.ru/api/v1/upload \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@voice_sample.mp3"
+# → {"url":"https://skill.neuroartist.ru/api/media/uploads/..."}
+
+# 2. Generate with cloned voice
+curl -X POST https://skill.neuroartist.ru/api/v1/generate \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"m":"fal-ai/f5-tts","i":{"gen_text":"Text to speak","ref_audio_url":"UPLOAD_URL","ref_text":"Transcript of reference"},"s":true}'
+```
+
+### Speech-to-Text
+```json
+{"m":"fal-ai/whisper","i":{"audio_url":"https://..."},"s":true}
+```
+Response: `{"text":"Transcribed text here..."}`
+
+## Upload Workflows
+
+### Image-to-Image with Upload
+```bash
+# 1. Upload source image
+curl -X POST https://skill.neuroartist.ru/api/v1/upload \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@photo.jpg"
+# → {"url":"https://skill.neuroartist.ru/api/media/uploads/...","key":"uploads/..."}
+
+# 2. Style transfer
+curl -X POST https://skill.neuroartist.ru/api/v1/generate \
+  -d '{"m":"fal-ai/flux/dev/image-to-image","i":{"image_url":"UPLOAD_URL","prompt":"oil painting style"},"s":true}'
+```
+
+### Product on White Background
+```bash
+# Upload → Remove BG → Upscale
+UPLOAD=$(curl -s -X POST .../upload -F "file=@product.jpg" | jq -r .url)
+NOBG=$(curl -s -X POST .../generate -d '{"m":"fal-ai/birefnet","i":{"image_url":"'$UPLOAD'"},"s":true}' | jq -r .url)
+curl -X POST .../generate -d '{"m":"fal-ai/aura-sr","i":{"image_url":"'$NOBG'"},"s":true}'
+```
+
+## Streaming (SSE)
+
+### Real-time Video Progress
+```typescript
+// For long operations like video generation
+const response = await fetch('https://skill.neuroartist.ru/api/v1/generate', {
+  method: 'POST',
+  headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    m: 'fal-ai/kling-video/v2.5/turbo/text-to-video',
+    i: { prompt: 'Aerial shot of mountains' },
+    s: false  // async mode
+  })
+});
+const { id } = await response.json();
+
+// Connect to SSE stream
+const events = new EventSource(
+  `https://skill.neuroartist.ru/api/v1/requests/${id}/stream`,
+  { headers: { 'Authorization': `Bearer ${token}` } }
+);
+
+events.onmessage = (e) => {
+  const data = JSON.parse(e.data);
+  console.log(`Status: ${data.status}, Progress: ${data.progress}%`);
+  if (data.status === 'completed') {
+    console.log('Video URL:', data.url);
+    events.close();
+  }
+};
+```
+
 ## Error Handling
 
-| Code | Action |
-|------|--------|
-| 429 | Wait `reset` seconds, retry |
-| 400 | Check model/params |
-| 401 | Check auth header |
+| Code | Error | Action |
+|------|-------|--------|
+| 401 | `no key` | Add Authorization header |
+| 402 | `insufficient balance` | Top up balance |
+| 429 | `rate limit` | Wait `reset` seconds |
+| 400 | `unknown model` | Check model ID |
+| 400 | `missing input` | Add required params |
+| 500 | `generation failed` | Retry or simplify prompt |
+
+### Retry Pattern
+```typescript
+async function generateWithRetry(params: object, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    const res = await fetch('.../generate', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(params)
+    });
+
+    if (res.status === 429) {
+      const { reset } = await res.json();
+      await new Promise(r => setTimeout(r, reset * 1000));
+      continue;
+    }
+
+    if (res.ok) return res.json();
+    throw new Error(`Failed: ${res.status}`);
+  }
+  throw new Error('Max retries exceeded');
+}

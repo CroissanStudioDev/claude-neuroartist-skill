@@ -19,7 +19,7 @@
     <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License">
   </a>
   <a href="https://github.com/CroissanStudioDev/neuroartist-skill-agents/releases">
-    <img src="https://img.shields.io/badge/version-1.0.0-green.svg" alt="Version">
+    <img src="https://img.shields.io/badge/version-1.4.0-green.svg" alt="Version">
   </a>
   <a href="https://skill.neuroartist.ru">
     <img src="https://img.shields.io/badge/models-1195+-purple.svg" alt="Models">
@@ -52,6 +52,7 @@
   - [Cursor](#cursor)
   - [Windsurf](#windsurf)
   - [OpenClaw](#openclaw)
+- [Специализированные скиллы](#специализированные-скиллы)
 - [Использование](#использование)
 - [Модели](#модели)
 - [Размеры для платформ](#размеры-для-платформ)
@@ -172,6 +173,64 @@ curl -sSL https://raw.githubusercontent.com/CroissanStudioDev/neuroartist-skill-
 
 ---
 
+## Специализированные скиллы
+
+Помимо основного скилла `neuroartist`, доступны фокусированные версии для конкретных задач:
+
+| Скилл | Фокус | Когда использовать |
+|-------|-------|-------------------|
+| `neuroartist` | Всё | Универсальный — изображения, видео, аудио |
+| `neuroartist-image` | Изображения | Только генерация картинок, апскейл, удаление фона |
+| `neuroartist-video` | Видео | Только text-to-video, image-to-video |
+| `neuroartist-audio` | Аудио | Только TTS, STT, клонирование голоса |
+
+### Зачем нужны специализированные скиллы?
+
+**Экономия токенов.** Основной скилл загружает документацию по всем типам контента (~300 токенов). Специализированный загружает только релевантную (~150 токенов).
+
+**Точнее триггеры.** Если вы работаете только с аудио, используйте `neuroartist-audio` — он не будет активироваться на "generate image".
+
+### Установка специализированных скиллов
+
+Специализированные скиллы находятся в `skills/neuroartist/skills/`:
+
+```bash
+# Структура
+skills/neuroartist/
+├── SKILL.md                    # Основной (универсальный)
+└── skills/
+    ├── neuroartist-image/      # Только изображения
+    │   └── SKILL.md
+    ├── neuroartist-video/      # Только видео
+    │   └── SKILL.md
+    └── neuroartist-audio/      # Только аудио
+        └── SKILL.md
+```
+
+При стандартной установке все скиллы доступны автоматически.
+
+### Триггеры специализированных скиллов
+
+**neuroartist-image:**
+```
+generate image, create image, flux, nano banana, recraft, upscale,
+remove background, text to image, сгенерируй картинку, убери фон
+```
+
+**neuroartist-video:**
+```
+generate video, create video, kling, minimax, luma, hunyuan,
+text to video, image to video, сгенерируй видео, анимируй
+```
+
+**neuroartist-audio:**
+```
+text to speech, tts, speech to text, stt, transcribe, whisper,
+voice cloning, озвучь, транскрибируй, голос
+```
+
+---
+
 ## Использование
 
 ### Триггеры активации
@@ -182,6 +241,7 @@ curl -sSL https://raw.githubusercontent.com/CroissanStudioDev/neuroartist-skill-
 |-----------|----------|
 | Изображения | `generate image`, `create image`, `сгенерируй картинку` |
 | Видео | `generate video`, `create video`, `сгенерируй видео` |
+| Аудио | `text to speech`, `tts`, `озвучь`, `transcribe`, `транскрибируй` |
 | Модели | `flux`, `nano banana`, `recraft`, `kling`, `stable diffusion` |
 | Обработка | `upscale`, `remove background`, `убери фон` |
 | Платформы | `для вк`, `для телеграм`, `для инстаграм` |
@@ -235,6 +295,37 @@ portrait_4_3  768×1024     portrait_16_9  576×1024
 landscape_4_3 1024×768     landscape_16_9 1024×576
 ```
 
+### CLI-скрипты
+
+Скрипты для быстрой автоматизации в `scripts/`:
+
+```bash
+# Настройка и проверка ключа
+export NEUROARTIST_KEY=na_live_xxx
+./scripts/setup.sh
+
+# Поиск моделей
+./scripts/search.sh image    # Изображения
+./scripts/search.sh video    # Видео
+./scripts/search.sh audio    # Аудио (TTS/STT)
+./scripts/search.sh flux     # Семейство FLUX
+
+# Быстрая генерация
+./scripts/generate.sh "закат над горами"
+./scripts/generate.sh "портрет кота" fal-ai/flux/dev portrait_4_3
+
+# Обработка изображений
+./scripts/upscale.sh https://example.com/photo.jpg          # Апскейл 4x
+./scripts/rembg.sh https://example.com/product.jpg          # Удаление фона
+
+# Аудио
+./scripts/tts.sh "Привет, это тест"                         # Озвучка
+./scripts/stt.sh https://example.com/recording.mp3          # Транскрипция
+
+# Проверка баланса
+./scripts/balance.sh
+```
+
 ---
 
 ## Модели
@@ -248,6 +339,8 @@ landscape_4_3 1024×768     landscape_16_9 1024×576
 | Текст на изображении | `fal-ai/nano-banana-pro` | 8 сек | ~13₽ |
 | Векторная графика (SVG) | `fal-ai/recraft/v4/text-to-vector` | 5 сек | ~7₽ |
 | Видео | `fal-ai/kling-video/v2.5/turbo/text-to-video` | 45 сек | ~50₽ |
+| Озвучка (TTS) | `fal-ai/f5-tts` | 3 сек | ~2₽ |
+| Транскрипция (STT) | `fal-ai/whisper` | 5 сек | ~1₽ |
 | Апскейл 4x | `fal-ai/aura-sr` | 3 сек | ~2₽ |
 | Удаление фона | `fal-ai/birefnet` | 2 сек | ~1₽ |
 
@@ -262,6 +355,8 @@ landscape_4_3 1024×768     landscape_16_9 1024×576
 Дизайн для маркетинга?    →  Recraft V4
 Видео с контролем?        →  Kling 2.5/3.0
 Видео быстро?             →  MiniMax или Luma
+Озвучка/клонирование?     →  F5-TTS
+Транскрипция аудио?       →  Whisper
 ```
 
 ### Семейства моделей
@@ -343,6 +438,20 @@ neuroartist-skill-agents/
     └── neuroartist/
         ├── SKILL.md                # Главный файл скилла (всегда загружается)
         │
+        ├── scripts/                # CLI-скрипты для автоматизации
+        │   ├── setup.sh            # Проверка ключа и баланса
+        │   ├── search.sh           # Поиск моделей по категориям
+        │   ├── generate.sh         # Быстрая генерация
+        │   └── balance.sh          # Проверка баланса
+        │
+        ├── skills/                 # Специализированные скиллы
+        │   ├── neuroartist-image/  # Только изображения (FLUX, Nano Banana, Recraft)
+        │   │   └── SKILL.md
+        │   ├── neuroartist-video/  # Только видео (Kling, MiniMax, Luma)
+        │   │   └── SKILL.md
+        │   └── neuroartist-audio/  # Только аудио (TTS, STT, клонирование)
+        │       └── SKILL.md
+        │
         ├── references/             # Справочники (загружаются по требованию)
         │   ├── models.md           # Полный каталог моделей
         │   ├── platforms.md        # Размеры для соцсетей
@@ -357,13 +466,18 @@ neuroartist-skill-agents/
 
 | Файл | Токенов | Когда загружается |
 |------|---------|-------------------|
-| SKILL.md | ~300 | Всегда |
+| SKILL.md (основной) | ~300 | Всегда |
+| neuroartist-image/SKILL.md | ~150 | Только для изображений |
+| neuroartist-video/SKILL.md | ~200 | Только для видео |
+| neuroartist-audio/SKILL.md | ~150 | Только для аудио |
 | models.md | ~700 | При выборе модели |
 | platforms.md | ~200 | При указании платформы |
 | prompting-images.md | ~500 | При работе с Nano Banana |
 | prompting-video.md | ~600 | При работе с Kling |
 
-**Типичное использование:** ~800-1200 токенов (база + 1-2 справочника)
+**Типичное использование:**
+- Основной скилл: ~800-1200 токенов (база + 1-2 справочника)
+- Специализированный: ~400-600 токенов (фокус на одном типе)
 
 ---
 

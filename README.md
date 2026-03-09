@@ -19,7 +19,7 @@
     <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License">
   </a>
   <a href="https://github.com/CroissanStudioDev/neuroartist-skill-agents/releases">
-    <img src="https://img.shields.io/badge/version-1.4.0-green.svg" alt="Version">
+    <img src="https://img.shields.io/badge/version-1.5.0-green.svg" alt="Version">
   </a>
   <a href="https://skill.neuroartist.ru">
     <img src="https://img.shields.io/badge/models-1195+-purple.svg" alt="Models">

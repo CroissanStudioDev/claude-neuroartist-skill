@@ -1,7 +1,7 @@
 ---
 name: neuroartist
 description: "Generate images/videos/audio with 1195+ AI models. Works in Russia (CDN proxy for blocked GCS). Token-optimized API with RU social media sizes (VK, Telegram, Instagram)."
-version: 1.4.0
+version: 1.5.0
 origin: skill.neuroartist.ru
 triggers:
   - generate image
@@ -142,6 +142,16 @@ TTS with optional voice cloning. Model: `f5-tts` (~2₽).
 ./scripts/stt.sh https://example.com/podcast.mp3 fal-ai/wizper
 ```
 Transcribes audio. Models: `whisper` (~1₽), `wizper` (~1.5₽).
+
+### Workflows (Chained Operations)
+```bash
+./scripts/workflow.sh product https://example.com/item.jpg    # Remove BG + Upscale
+./scripts/workflow.sh hero "epic mountain landscape"          # Generate + Upscale
+./scripts/workflow.sh social "cozy cafe" vk                   # Generate for platform
+./scripts/workflow.sh animate https://example.com/face.jpg "she smiles"  # Image to video
+./scripts/workflow.sh voiceover "Welcome to our channel"      # TTS
+```
+Chains multiple operations. Platforms: `vk`, `instagram`, `youtube`, `telegram`, `story`.
 
 ## Generate (POST /generate)
 
